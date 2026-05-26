@@ -108,6 +108,59 @@ See section 12 of the architecture doc for the canonical `.service` file (`CPUAf
 
 ---
 
+## Visualizer (this repo)
+
+A browser-based real-time visualizer for the DRS cluster. Passive UDP multicast sniffer + WebSocket relay + React frontend.
+
+### Commands
+
+```bash
+# Install all dependencies (first time)
+npm run install:all   # from repo root, or:
+cd server && npm install
+cd client && npm install
+
+# Run both server and client (two terminals, or from root):
+npm run dev           # root — uses concurrently
+
+# Individually:
+cd server && npm run dev   # Node.js WS server on :3001  (node --watch)
+cd client && npm run dev   # Vite dev server   on :5173
+```
+
+Open `http://localhost:5173` after starting both.
+
+### Architecture
+
+```
+DRS nodes (Pi LAN)
+  │  UDP multicast 239.192.88.100:47200
+  ▼
+server/src/index.js    — joins multicast group, parses 64-byte DRS packets,
+                         maintains node state map, broadcasts via WebSocket
+  │  ws://localhost:3001
+  ▼
+client/src/App.jsx     — WebSocket client, state management
+  ├── ClusterGraph.jsx — SVG topology: nodes in circle, animated packet links
+  ├── NodeCard.jsx     — per-node status (state, offset, RTT, flags)
+  └── PacketLog.jsx    — scrolling packet stream with auto-scroll
+```
+
+### WebSocket event types
+
+| Type | Direction | Description |
+|---|---|---|
+| `snapshot` | server→client | Full state on connect: `{ nodes[], packets[] }` |
+| `node_update` | server→client | Upsert a node: `{ node }` |
+| `node_remove` | server→client | Node expired (30 s TTL): `{ nodeId }` |
+| `packet` | server→client | Every parsed packet: `{ packet }` |
+
+### Offset/RTT availability
+
+Offset (θ) and RTT (δ) require all four timestamps T1–T4. In passive multicast sniffing, T4 is computed by the follower locally and is typically zero in sniffed SYNC_RESP packets — so these metrics show `—` unless the DRS implementation populates T4 in the outgoing packet. The node's state and flags are always fully visible.
+
+---
+
 ## Think Before Coding
 
 **Don't assume. Don't hide confusion. Surface tradeoffs.**
