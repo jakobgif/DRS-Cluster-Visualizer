@@ -1,0 +1,89 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* ── Header ──────────────────────────────────────────────── */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  gap: 12px;
+}
+
+.header-left {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.app-title {
+  font-size: 0.8rem;
+  font-weight: bold;
+  letter-spacing: 0.14em;
+  color: #c8d8e8;
+}
+
+.header-meta {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+}
+
+.conn-badge {
+  font-size: 0.72rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  flex-shrink: 0;
+}
+.conn-live { color: #34d399; }
+.conn-dead { color: #6b7280; }
+
+/* ── Main layout ─────────────────────────────────────────── */
+.app-main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.graph-panel {
+  flex: 1;
+  min-width: 0;
+  border-right: 1px solid var(--border);
+  overflow: hidden;
+  position: relative;
+}
+
+.side-panel {
+  width: 360px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ── Node cards ──────────────────────────────────────────── */
+.node-cards {
+  padding: 10px;
+  overflow-y: auto;
+  max-height: 45%;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.empty-hint {
+  color: var(--text-dim);
+  font-size: 0.72rem;
+  text-align: center;
+  padding: 16px 8px;
+  line-height: 1.5;
+}

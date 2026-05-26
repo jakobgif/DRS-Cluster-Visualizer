@@ -1,0 +1,68 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Courier New', Courier, monospace;
+  background: #0a0e1a;
+  color: #c8d8e8;
+  height: 100vh;
+  overflow: hidden;
+}
+
+:root {
+  --bg:          #0a0e1a;
+  --surface:     #111827;
+  --surface2:    #0f1724;
+  --border:      #1e2d40;
+  --leader:      #f5c542;
+  --follower:    #4a9eff;
+  --holdover:    #ff8c42;
+  --fault:       #ff4444;
+  --calibration: #4affea;
+  --ground:      #6b7280;
+  --text-dim:    #4b5563;
+  --text:        #c8d8e8;
+  --announce:    #a78bfa;
+  --sync-req:    #60a5fa;
+  --sync-resp:   #34d399;
+}
+
+/* SVG link flow animations */
+@keyframes flowAnim {
+  from { stroke-dashoffset: 24; }
+  to   { stroke-dashoffset: 0;  }
+}
+
+@keyframes leaderPulse {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 0.9;  }
+}
+
+.link-sync-req {
+  stroke: var(--sync-req);
+  stroke-width: 2;
+  stroke-dasharray: 8 4;
+  animation: flowAnim 0.5s linear infinite;
+}
+
+.link-sync-resp {
+  stroke: var(--sync-resp);
+  stroke-width: 2;
+  stroke-dasharray: 8 4;
+  animation: flowAnim 0.4s linear infinite;
+}
+
+.link-announce {
+  stroke: var(--announce);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 6;
+  animation: flowAnim 0.9s linear infinite;
+}
+
+.leader-pulse {
+  animation: leaderPulse 1.4s ease-in-out infinite;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
