@@ -1,0 +1,12 @@
+{
+  "name": "drs-cluster-visualizer",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n \"server,client\" -c \"yellow,cyan\" \"npm --prefix server run dev\" \"npm --prefix client run dev\"",
+    "install:all": "npm --prefix server install && npm --prefix client install"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}
