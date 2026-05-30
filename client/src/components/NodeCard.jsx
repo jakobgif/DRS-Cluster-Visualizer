@@ -71,7 +71,7 @@ export default function NodeCard({ node }) {
           <span className="metric-value">{fmtRtt(node.rttNs)}</span>
         </div>
         <div className="metric">
-          <span className="metric-label">TERM</span>
+          <span className="metric-label">ELECTION</span>
           <span className="metric-value">{node.electionTerm ?? '—'}</span>
         </div>
         <div className="metric">
@@ -120,7 +120,7 @@ export default function NodeCard({ node }) {
           background: color-mix(in srgb, var(--node-color) 12%, transparent);
         }
         .node-ip {
-          color: #374151;
+          color: #5a7080;
           margin-left: auto;
           font-size: 0.68rem;
         }
@@ -136,13 +136,13 @@ export default function NodeCard({ node }) {
           gap: 1px;
         }
         .metric-label {
-          color: #374151;
-          font-size: 0.6rem;
+          color: #607080;
+          font-size: 0.62rem;
           letter-spacing: 0.08em;
         }
         .metric-value {
-          color: #9ca3af;
-          font-size: 0.72rem;
+          color: #b0bec8;
+          font-size: 0.74rem;
           white-space: nowrap;
         }
         .node-footer {
@@ -159,10 +159,10 @@ export default function NodeCard({ node }) {
           letter-spacing: 0.06em;
         }
         .flag-ok   { background: rgba(52,211,153,0.15); color: #34d399; }
-        .flag-off  { background: rgba(55,65,81,0.3);    color: #374151; }
+        .flag-off  { background: rgba(55,65,81,0.3);    color: #506070; }
         .flag-warn { background: rgba(255,140,66,0.15); color: #ff8c42; }
         .flag-err  { background: rgba(255,68,68,0.15);  color: #ff4444; }
-        .node-last-seen { color: #374151; font-size: 0.65rem; }
+        .node-last-seen { color: #607080; font-size: 0.65rem; }
       `}</style>
     </div>
   );

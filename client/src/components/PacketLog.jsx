@@ -51,6 +51,14 @@ export default function PacketLog({ packets }) {
         <span>PACKET LOG</span>
         <span className="pkt-count">{packets.length}</span>
       </div>
+      <div className="pkt-col-headers">
+        <span>TIME</span>
+        <span>SRC</span>
+        <span>TYPE</span>
+        <span>SEQ</span>
+        <span>OFFSET</span>
+        <span />
+      </div>
       <div className="pkt-rows" ref={logRef} onScroll={onScroll}>
         {packets.map((pkt, i) => {
           const color  = MSG_COLOR[pkt.msgType] ?? '#6b7280';
@@ -85,7 +93,7 @@ export default function PacketLog({ packets }) {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          color: #374151;
+          color: #607080;
           font-size: 0.65rem;
           letter-spacing: 0.1em;
           border-bottom: 1px solid #1a2d40;
@@ -95,6 +103,17 @@ export default function PacketLog({ packets }) {
           background: #1a2d40;
           padding: 1px 6px;
           border-radius: 8px;
+        }
+        .pkt-col-headers {
+          display: grid;
+          grid-template-columns: 90px 56px 84px 40px 1fr auto;
+          gap: 0;
+          padding: 3px 12px;
+          border-bottom: 1px solid #1a2d40;
+          color: #3d5060;
+          font-size: 0.6rem;
+          letter-spacing: 0.1em;
+          flex-shrink: 0;
         }
         .pkt-rows {
           flex: 1;
@@ -111,11 +130,11 @@ export default function PacketLog({ packets }) {
           white-space: nowrap;
         }
         .pkt-row:last-child { border-bottom: none; }
-        .pkt-time   { color: #374151; }
-        .pkt-src    { color: #4b5563; }
-        .pkt-type   { font-weight: bold; font-size: 0.66rem; letter-spacing: 0.04em; }
-        .pkt-seq    { color: #374151; }
-        .pkt-offset { color: #6b7280; }
+        .pkt-time   { color: #607080; }
+        .pkt-src    { color: #6b7a88; }
+        .pkt-type   { font-weight: bold; font-size: 0.68rem; letter-spacing: 0.04em; }
+        .pkt-seq    { color: #607080; }
+        .pkt-offset { color: #8090a0; }
         .pkt-crc-err {
           color: #ff4444;
           font-size: 0.6rem;

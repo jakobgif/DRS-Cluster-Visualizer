@@ -175,21 +175,21 @@ export default function ClusterGraph({ nodes, packets }) {
 
               {/* State label above */}
               <text textAnchor="middle" y={-30}
-                fontSize={8} fill={color} opacity={0.8} fontFamily="'Courier New', monospace">
+                fontSize={9} fill={color} fontFamily="'Courier New', monospace">
                 {node.state}
               </text>
 
               {/* Offset below (µs) */}
               {node.offsetNs !== null && (
                 <text textAnchor="middle" y={34}
-                  fontSize={8} fill="#6b7280" fontFamily="'Courier New', monospace">
+                  fontSize={9} fill="#8090a0" fontFamily="'Courier New', monospace">
                   {(node.offsetNs / 1000).toFixed(1)}µs
                 </text>
               )}
 
               {/* IP label */}
-              <text textAnchor="middle" y={44}
-                fontSize={7} fill="#374151" fontFamily="'Courier New', monospace">
+              <text textAnchor="middle" y={46}
+                fontSize={9} fill="#5a7080" fontFamily="'Courier New', monospace">
                 {node.ip}
               </text>
             </g>
