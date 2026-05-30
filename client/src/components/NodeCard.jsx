@@ -22,6 +22,12 @@ function fmtRtt(ns) {
   return `${(ns / 1000).toFixed(1)} µs`;
 }
 
+function fmtRate(ppm) {
+  if (ppm === null || ppm === undefined) return '—';
+  const sign = ppm >= 0 ? '+' : '';
+  return `${sign}${ppm.toFixed(1)}`;
+}
+
 function syncQualityColor(ns) {
   if (ns === null) return '#374151';
   const us = Math.abs(ns / 1000);
@@ -69,6 +75,10 @@ export default function NodeCard({ node }) {
         <div className="metric">
           <span className="metric-label">RTT</span>
           <span className="metric-value">{fmtRtt(node.rttNs)}</span>
+        </div>
+        <div className="metric">
+          <span className="metric-label">RATE ppm</span>
+          <span className="metric-value">{fmtRate(node.ratePpm)}</span>
         </div>
         <div className="metric">
           <span className="metric-label">ELECTION</span>
@@ -126,7 +136,7 @@ export default function NodeCard({ node }) {
         }
         .node-metrics {
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
+          grid-template-columns: repeat(5, 1fr);
           gap: 4px;
           margin-bottom: 6px;
         }

@@ -1,10 +1,11 @@
 import dgram from 'dgram';
 import { WebSocketServer } from 'ws';
-import { parsePacket } from './parser.js';
+import { parsePacket, parseTelemetry } from './parser.js';
 
-const MULTICAST_GROUP = '239.192.88.100';
-const MULTICAST_PORT  = 47200;
-const WS_PORT         = 3001;
+const MULTICAST_GROUP  = '239.192.88.100';
+const MULTICAST_PORT   = 47200;
+const TELEMETRY_PORT   = 4242;
+const WS_PORT          = 3001;
 const NODE_TTL_MS     = 30_000;
 const MAX_PACKETS     = 200;
 
@@ -26,6 +27,7 @@ function deriveState(packet) {
 function upsertNode(packet) {
   const prev = nodes.get(packet.nodeId) ?? {};
   const node = {
+    ...prev,
     nodeId:       packet.nodeId,
     ip:           packet.srcIp,
     state:        deriveState(packet),
@@ -37,6 +39,22 @@ function upsertNode(packet) {
     lastSeen:     packet.rxTime,
   };
   nodes.set(packet.nodeId, node);
+  return node;
+}
+
+function upsertNodeFromTelemetry(telem) {
+  const prev = nodes.get(telem.nodeId) ?? {};
+  const node = {
+    ...prev,
+    nodeId:   telem.nodeId,
+    ip:       telem.srcIp,
+    state:    telem.state,
+    offsetNs: telem.offsetNs,
+    rttNs:    telem.rttNs,
+    ratePpm:  telem.ratePpm,
+    lastSeen: telem.rxTime,
+  };
+  nodes.set(telem.nodeId, node);
   return node;
 }
 
@@ -110,3 +128,25 @@ socket.on('error', err => {
 });
 
 socket.bind(MULTICAST_PORT);
+
+// ── Telemetry listener (UDP unicast :4242) ────────────────────────────────────
+
+const telemSocket = dgram.createSocket({ type: 'udp4', reuseAddr: true });
+
+telemSocket.on('message', (msg, rinfo) => {
+  const telem = parseTelemetry(msg, rinfo.address);
+  if (!telem) return;
+  const node = upsertNodeFromTelemetry(telem);
+  broadcast({ type: 'node_update', node });
+});
+
+telemSocket.on('listening', () => {
+  const addr = telemSocket.address();
+  console.log(`Telemetry  udp://0.0.0.0:${addr.port}`);
+});
+
+telemSocket.on('error', err => {
+  console.error('Telemetry socket error:', err.message);
+});
+
+telemSocket.bind(TELEMETRY_PORT);

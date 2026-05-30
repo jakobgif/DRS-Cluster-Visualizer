@@ -94,3 +94,33 @@ export function parsePacket(buf, srcIp) {
     rxTime: Date.now(),
   };
 }
+
+// Telemetry packet layout (40 bytes, little-endian):
+//  0- 7: timestamp_ns (int64)
+//  8-11: state        (int32)
+// 12-19: offset_ns    (int64)
+// 20-27: rtt_ns       (int64)
+// 28-35: rate_q32     (int64, Q32.32 fixed-point)
+// 36-39: node_id      (uint32)
+
+const TELEMETRY_STATES = ['GROUND', 'CALIBRATION', 'LISTEN', 'CANDIDATE', 'FOLLOWER', 'LEADER', 'HOLDOVER'];
+const RATE_ONE = 4294967296; // 2^32 — safe as Number; deviations are << 2^53
+
+export function parseTelemetry(buf, srcIp) {
+  if (buf.length < 40) return null;
+  const state    = buf.readInt32LE(8);
+  const offsetNs = Number(buf.readBigInt64LE(12));
+  const rttNs    = Number(buf.readBigInt64LE(20));
+  const rateQ32  = Number(buf.readBigInt64LE(28));
+  const nodeId   = buf.readUInt32LE(36);
+
+  return {
+    nodeId,
+    srcIp,
+    state:   TELEMETRY_STATES[state] ?? 'UNKNOWN',
+    offsetNs,
+    rttNs,
+    ratePpm: (rateQ32 - RATE_ONE) / RATE_ONE * 1e6,
+    rxTime:  Date.now(),
+  };
+}
