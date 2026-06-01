@@ -22,12 +22,6 @@ function shortIp(ip) {
   return parts.slice(-2).join('.');
 }
 
-function fmtOffset(ns) {
-  if (ns === null || ns === undefined) return null;
-  const us = ns / 1000;
-  const sign = us >= 0 ? '+' : '';
-  return `${sign}${us.toFixed(1)}µs`;
-}
 
 export default function PacketLog({ packets }) {
   const logRef = useRef(null);
@@ -74,23 +68,16 @@ export default function PacketLog({ packets }) {
         <span>NODE</span>
         <span>TYPE</span>
         <span>SEQ</span>
-        <span>OFFSET</span>
-        <span />
       </div>
       <div className="pkt-rows" ref={logRef} onScroll={onScroll}>
         {display.map((pkt, i) => {
-          const color  = MSG_COLOR[pkt.msgType] ?? '#6b7280';
-          const offset = fmtOffset(pkt.offsetNs);
+          const color = MSG_COLOR[pkt.msgType] ?? '#6b7280';
           return (
             <div key={i} className="pkt-row">
               <span className="pkt-time">{fmtTime(pkt.rxTime)}</span>
               <span className="pkt-src">N:{pkt.nodeId}</span>
               <span className="pkt-type" style={{ color }}>{pkt.msgType}</span>
               <span className="pkt-seq">{pkt.seq}</span>
-              {offset
-                ? <span className="pkt-offset" style={{ color: '#9ca3af' }}>{offset}</span>
-                : <span className="pkt-offset" />
-              }
               {!pkt.crcOk && <span className="pkt-crc-err">CRC!</span>}
             </div>
           );
@@ -138,7 +125,7 @@ export default function PacketLog({ packets }) {
         .pkt-pause-btn--paused:hover { border-color: #f5c542; color: #f5c542; }
         .pkt-col-headers {
           display: grid;
-          grid-template-columns: 90px 56px 84px 40px 1fr auto;
+          grid-template-columns: 90px 48px 84px 1fr;
           gap: 0;
           padding: 3px 12px;
           border-bottom: 1px solid #1a2d40;
@@ -154,7 +141,7 @@ export default function PacketLog({ packets }) {
         }
         .pkt-row {
           display: grid;
-          grid-template-columns: 90px 56px 84px 40px 1fr auto;
+          grid-template-columns: 90px 48px 84px 1fr;
           gap: 0;
           padding: 2px 12px;
           border-bottom: 1px solid #0f1a26;
