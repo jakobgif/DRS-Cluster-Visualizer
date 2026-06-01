@@ -24,7 +24,7 @@ function readUint64BE(buf, offset) {
 const MAGIC = 0x44525354; // "DRST"
 const MSG_TYPE_MAP = { 0x01: 'ANNOUNCE', 0x02: 'SYNC_REQ', 0x03: 'SYNC_RESP' };
 
-// Packet layout (64 bytes, big-endian):
+// Packet layout (66 bytes, big-endian):
 //  0- 3: Magic (uint32)
 //  4:    Version (uint8)
 //  5:    MsgType (uint8)
@@ -37,11 +37,11 @@ const MSG_TYPE_MAP = { 0x01: 'ANNOUNCE', 0x02: 'SYNC_REQ', 0x03: 'SYNC_RESP' };
 // 26-33: T2 (uint64)
 // 34-41: T3 (uint64)
 // 42-49: T4 (uint64)
-// 50-53: CRC32 (uint32)  — covers bytes 0-49
-// 54-63: Padding (10 bytes, zero)
+// 50-53: CRC32 (uint32)  — over full 66-byte packet with this field zeroed
+// 54-65: Padding (12 bytes, zero)
 
 export function parsePacket(buf, srcIp) {
-  if (buf.length < 64) return null;
+  if (buf.length < 66) return null;
   if (buf.readUInt32BE(0) !== MAGIC) return null;
 
   const version     = buf.readUInt8(4);
@@ -54,9 +54,12 @@ export function parsePacket(buf, srcIp) {
   const t2 = readUint64BE(buf, 26);
   const t3 = readUint64BE(buf, 34);
   const t4 = readUint64BE(buf, 42);
-  const storedCrc   = buf.readUInt32BE(50);
+  const storedCrc = buf.readUInt32BE(50);
 
-  const crcOk = crc32(buf, 0, 50) === storedCrc;
+  // Pi computes CRC over the full 64-byte packet with the CRC field zeroed.
+  const tmp = Buffer.from(buf.subarray(0, 66));
+  tmp.writeUInt32BE(0, 50);
+  const crcOk = crc32(tmp, 0, 66) === storedCrc;
 
   const msgType = MSG_TYPE_MAP[msgTypeByte] ?? `UNK(0x${msgTypeByte.toString(16)})`;
 
