@@ -1,4 +1,5 @@
 import dgram from 'dgram';
+import os from 'os';
 import { WebSocketServer } from 'ws';
 import { parsePacket, parseTelemetry } from './parser.js';
 
@@ -112,15 +113,27 @@ socket.on('message', (msg, rinfo) => {
 });
 
 socket.on('listening', () => {
-  try {
-    socket.addMembership(MULTICAST_GROUP);
-  } catch (e) {
-    console.error('Failed to join multicast group:', e.message);
-    console.error('Make sure your network interface supports multicast and you are on the DRS LAN.');
+  socket.setMulticastLoopback(true);
+  // Join on every non-loopback IPv4 interface — on Windows the default interface
+  // is often Wi-Fi/loopback, not the DRS Ethernet port, so we join on all of them.
+  const ifaces = os.networkInterfaces();
+  let joined = 0;
+  for (const [name, addrs] of Object.entries(ifaces)) {
+    for (const addr of addrs) {
+      if (addr.family === 'IPv4' && !addr.internal) {
+        try {
+          socket.addMembership(MULTICAST_GROUP, addr.address);
+          console.log(`Joined multicast ${MULTICAST_GROUP} on ${name} (${addr.address})`);
+          joined++;
+        } catch (e) {
+          console.warn(`  skip ${name} (${addr.address}): ${e.message}`);
+        }
+      }
+    }
   }
-  socket.setMulticastLoopback(true); // receive own traffic for local testing
+  if (joined === 0) console.error('Could not join multicast group on any interface');
   const addr = socket.address();
-  console.log(`UDP listen  ${addr.address}:${addr.port}  group ${MULTICAST_GROUP}`);
+  console.log(`UDP listen  0.0.0.0:${addr.port}`);
 });
 
 socket.on('error', err => {
