@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const MSG_COLOR = {
   ANNOUNCE:  '#a78bfa',
@@ -31,13 +31,26 @@ function fmtOffset(ns) {
 
 export default function PacketLog({ packets }) {
   const logRef = useRef(null);
-  const pinned = useRef(true); // auto-scroll while pinned to bottom
+  const pinned = useRef(true);
+  const [paused, setPaused] = useState(false);
+  const [frozen, setFrozen] = useState(null);
+
+  const display = paused ? frozen : packets;
 
   useEffect(() => {
     const el = logRef.current;
-    if (!el || !pinned.current) return;
+    if (!el || !pinned.current || paused) return;
     el.scrollTop = el.scrollHeight;
-  }, [packets]);
+  }, [packets, paused]);
+
+  function togglePause() {
+    if (!paused) {
+      setFrozen(packets);
+    } else {
+      pinned.current = true;
+    }
+    setPaused(p => !p);
+  }
 
   function onScroll() {
     const el = logRef.current;
@@ -49,7 +62,12 @@ export default function PacketLog({ packets }) {
     <div className="pkt-log">
       <div className="pkt-log-header">
         <span>PACKET LOG</span>
-        <span className="pkt-count">{packets.length}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button className={`pkt-pause-btn ${paused ? 'pkt-pause-btn--paused' : ''}`} onClick={togglePause}>
+            {paused ? 'RESUME' : 'PAUSE'}
+          </button>
+          <span className="pkt-count">{display.length}</span>
+        </div>
       </div>
       <div className="pkt-col-headers">
         <span>TIME</span>
@@ -60,7 +78,7 @@ export default function PacketLog({ packets }) {
         <span />
       </div>
       <div className="pkt-rows" ref={logRef} onScroll={onScroll}>
-        {packets.map((pkt, i) => {
+        {display.map((pkt, i) => {
           const color  = MSG_COLOR[pkt.msgType] ?? '#6b7280';
           const offset = fmtOffset(pkt.offsetNs);
           return (
@@ -104,6 +122,20 @@ export default function PacketLog({ packets }) {
           padding: 1px 6px;
           border-radius: 8px;
         }
+        .pkt-pause-btn {
+          background: none;
+          border: 1px solid #1e3a50;
+          color: #607080;
+          font-family: 'Courier New', monospace;
+          font-size: 0.6rem;
+          letter-spacing: 0.1em;
+          padding: 1px 6px;
+          border-radius: 3px;
+          cursor: pointer;
+        }
+        .pkt-pause-btn:hover { border-color: #4a9eff; color: #4a9eff; }
+        .pkt-pause-btn--paused { border-color: #f5c542; color: #f5c542; }
+        .pkt-pause-btn--paused:hover { border-color: #f5c542; color: #f5c542; }
         .pkt-col-headers {
           display: grid;
           grid-template-columns: 90px 56px 84px 40px 1fr auto;
