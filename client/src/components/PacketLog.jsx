@@ -71,7 +71,7 @@ export default function PacketLog({ packets }) {
       </div>
       <div className="pkt-col-headers">
         <span>TIME</span>
-        <span>SRC</span>
+        <span>NODE</span>
         <span>TYPE</span>
         <span>SEQ</span>
         <span>OFFSET</span>
@@ -84,7 +84,7 @@ export default function PacketLog({ packets }) {
           return (
             <div key={i} className="pkt-row">
               <span className="pkt-time">{fmtTime(pkt.rxTime)}</span>
-              <span className="pkt-src">{shortIp(pkt.srcIp)}</span>
+              <span className="pkt-src">N:{pkt.nodeId}</span>
               <span className="pkt-type" style={{ color }}>{pkt.msgType}</span>
               <span className="pkt-seq">{pkt.seq}</span>
               {offset
